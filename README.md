@@ -180,18 +180,31 @@ Full step-by-step instructions, checklists, and troubleshooting: **[DEPLOYMENT.m
 
 ## Docker instructions
 
+Run **frontend and backend together** with one command from the repo root.
+
 ### Requirements
 
 - Docker Engine 24+ and Compose v2
+- `.env` file with `DIRECT_URL` (Supabase) and other variables (see `.env.example`)
 
 ### Quick start
 
 ```bash
 cp .env.example .env
-# Set DIRECT_URL, DJANGO_SECRET_KEY, NEXT_PUBLIC_API_URL=http://localhost:8000/api
+# Edit .env — set DIRECT_URL, DJANGO_SECRET_KEY, etc.
 
 docker compose up --build
 ```
+
+Wait until both services are healthy, then open:
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| API | http://localhost:8000/api/ |
+| Admin | http://localhost:8000/admin/ |
+
+Stop with `Ctrl+C` or `docker compose down`.
 
 | Service | URL |
 |---------|-----|

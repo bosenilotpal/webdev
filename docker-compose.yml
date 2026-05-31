@@ -1,9 +1,14 @@
+# Local full stack: docker compose up --build
+# Requires .env at repo root (copy from .env.example)
+
 services:
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - '8000:8000'
     environment:
@@ -16,6 +21,17 @@ services:
       MEDIA_ROOT: /app/media
     volumes:
       - media_data:/app/media
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'python -c "import urllib.request; urllib.request.urlopen(''http://127.0.0.1:8000/api/gyms/'')" || exit 1',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+
   frontend:
     build:
       context: ./frontend
@@ -23,6 +39,8 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - '3000:3000'
     environment:
@@ -30,7 +48,8 @@ services:
       API_ORIGIN: http://backend:8000
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   media_data:
