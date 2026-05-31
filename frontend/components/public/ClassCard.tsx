@@ -17,14 +17,16 @@ export default function ClassCard({ classItem }: ClassCardProps) {
           <span className="class-card-pill">
             {classItem.numberOfClasses} classes
           </span>
-          <span className="class-card-pill class-card-pill--price">
-            {formatCurrency(classItem.price)}
-          </span>
         </div>
         <p className="class-card-description">
           {classItem.description ||
             'Expert-led training to help you achieve your fitness goals.'}
         </p>
+      </div>
+      <div className="card-price-badge" aria-label={`Price ${formatCurrency(classItem.price)}`}>
+        <span className="card-price-badge__amount">
+          {formatCurrency(classItem.price)}
+        </span>
       </div>
     </article>
   );

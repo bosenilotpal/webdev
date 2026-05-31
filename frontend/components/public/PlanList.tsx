@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Modal, Button as AntButton } from 'antd';
+import { Modal } from 'antd';
 import { Plan } from '@/lib/types';
 import { formatCurrency } from '@/lib/utils';
 import CardsGrid from '@/components/public/CardsGrid';
@@ -13,10 +13,6 @@ interface PlanListProps {
 
 export default function PlanList({ plans }: PlanListProps) {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-
-  const handleCloseModal = () => {
-    setSelectedPlan(null);
-  };
 
   return (
     <>
@@ -37,24 +33,13 @@ export default function PlanList({ plans }: PlanListProps) {
           </span>
         }
         open={!!selectedPlan}
-        onCancel={handleCloseModal}
-        footer={[
-          <AntButton key="close" onClick={handleCloseModal}>
-            Close
-          </AntButton>,
-          <AntButton key="select" type="primary">
-            Select Plan
-          </AntButton>,
-        ]}
+        onCancel={() => setSelectedPlan(null)}
+        footer={null}
         width={600}
+        className="plan-detail-modal"
       >
         {selectedPlan && (
           <div className="plan-modal-content">
-            <div className="plan-modal-price">
-              {formatCurrency(selectedPlan.price)}
-              <span> / {selectedPlan.duration}</span>
-            </div>
-
             {selectedPlan.description && (
               <p className="plan-modal-description">{selectedPlan.description}</p>
             )}
@@ -69,6 +54,16 @@ export default function PlanList({ plans }: PlanListProps) {
                 </ul>
               </div>
             )}
+
+            <div
+              className="card-price-badge card-price-badge--modal"
+              aria-label={`Price ${formatCurrency(selectedPlan.price)} per ${selectedPlan.duration}`}
+            >
+              <span className="card-price-badge__amount">
+                {formatCurrency(selectedPlan.price)}
+              </span>
+              <span className="card-price-badge__sub">/ {selectedPlan.duration}</span>
+            </div>
           </div>
         )}
       </Modal>

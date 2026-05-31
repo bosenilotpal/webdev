@@ -69,6 +69,10 @@ export default async function GymPage({ params }: PageProps) {
     cmsItems,
     'Trainer List Description'
   );
+  const newsletterHeading = getCmsByName(cmsItems, 'Newsletter Heading');
+  const newsletterSubheading = getCmsByName(cmsItems, 'Newsletter Subheading');
+  const newsletterButton = getCmsByName(cmsItems, 'Newsletter Button Text');
+  const newsletterPlaceholder = getCmsByName(cmsItems, 'Newsletter Placeholder');
 
   if (!gym) {
     return (
@@ -162,7 +166,12 @@ export default async function GymPage({ params }: PageProps) {
             )}
           </section>
 
-          <NewsletterSection />
+          <NewsletterSection
+            heading={newsletterHeading?.content}
+            subheading={newsletterSubheading?.content}
+            buttonText={newsletterButton?.content}
+            placeholder={newsletterPlaceholder?.content}
+          />
         </div>
       </main>
       <Footer />

@@ -1,42 +1,68 @@
 'use client';
 
 import { useState } from 'react';
-import Input from '@/components/shared/Input';
-import Button from '@/components/shared/Button';
+import { MailOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
-export default function NewsletterSection() {
+interface NewsletterSectionProps {
+  heading?: string;
+  subheading?: string;
+  buttonText?: string;
+  placeholder?: string;
+}
+
+export default function NewsletterSection({
+  heading = 'GET CONNECTED WITH US',
+  subheading = 'Join our community for motivation, tips, and exclusive offers.',
+  buttonText = 'Join Now',
+  placeholder = 'Enter your email',
+}: NewsletterSectionProps) {
   const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle newsletter subscription
-    console.log('Newsletter subscription:', email);
+    if (!email.trim()) return;
+    setSubmitted(true);
     setEmail('');
   };
 
   return (
-    <section className="newsletter-section">
+    <section className="newsletter-section" aria-labelledby="newsletter-heading">
+      <div className="newsletter-section__glow" aria-hidden />
       <div className="newsletter-container">
-        <h2 className="newsletter-heading">GET CONNECTED WITH US</h2>
-        <p className="newsletter-sub-heading">Join our community for motivation</p>
-        <form onSubmit={handleSubmit} className="newsletter-form">
-          <Input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="newsletter-input"
-          />
-          <Button type="submit" variant="primary" size="lg">
-            Join Now
-          </Button>
-        </form>
+        <div className="newsletter-icon" aria-hidden>
+          <MailOutlined />
+        </div>
+        <h2 id="newsletter-heading" className="newsletter-heading">
+          {heading}
+        </h2>
+        <p className="newsletter-sub-heading">{subheading}</p>
+
+        {submitted ? (
+          <p className="newsletter-success" role="status">
+            <CheckCircleOutlined /> Thanks for subscribing!
+          </p>
+        ) : (
+          <form onSubmit={handleSubmit} className="newsletter-form">
+            <label htmlFor="newsletter-email" className="visually-hidden">
+              Email address
+            </label>
+            <input
+              id="newsletter-email"
+              type="email"
+              required
+              placeholder={placeholder}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="newsletter-field"
+              autoComplete="email"
+            />
+            <button type="submit" className="newsletter-submit">
+              {buttonText}
+            </button>
+          </form>
+        )}
       </div>
     </section>
   );
 }
-
-
-
-
-

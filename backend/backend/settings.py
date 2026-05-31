@@ -21,7 +21,8 @@ ROOT_DIR = BASE_DIR.parent
 try:
     from dotenv import load_dotenv
 
-    load_dotenv(ROOT_DIR / '.env', override=True)
+    _env_file = os.environ.get('ENV_FILE', '.env')
+    load_dotenv(ROOT_DIR / _env_file, override=True)
     if os.environ.get('DIRECT_URL'):
         os.environ.pop('DATABASE_URL', None)
 except ImportError:
@@ -79,12 +80,34 @@ CORS_ALLOWED_ORIGINS = _env_list(
     'CORS_ALLOWED_ORIGINS',
     'http://localhost:3000,http://127.0.0.1:3000',
 )
-CORS_ALLOW_CREDENTIALS = True
+# Always allow Vercel deployments; override with CORS_ALLOWED_ORIGIN_REGEXES (use "off" to disable)
+_cors_regex_env = os.environ.get('CORS_ALLOWED_ORIGIN_REGEXES', '').strip()
+if _cors_regex_env.lower() == 'off':
+    CORS_ALLOWED_ORIGIN_REGEXES = []
+elif _cors_regex_env:
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        item.strip() for item in _cors_regex_env.split('|') if item.strip()
+    ]
+else:
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r'^https://[\w-]+\.vercel\.app$',
+    ]
 
-CSRF_TRUSTED_ORIGINS = _env_list(
-    'CSRF_TRUSTED_ORIGINS',
-    ','.join(CORS_ALLOWED_ORIGINS),
-)
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'authorization',
+    'content-type',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+_csrf_origins = _env_list('CSRF_TRUSTED_ORIGINS', ','.join(CORS_ALLOWED_ORIGINS))
+if not DEBUG and not _csrf_origins:
+    _csrf_origins = list(CORS_ALLOWED_ORIGINS)
+CSRF_TRUSTED_ORIGINS = _csrf_origins
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -208,7 +231,15 @@ STORAGES = {
 MEDIA_ROOT = Path(os.environ.get('MEDIA_ROOT', str(BASE_DIR)))
 MEDIA_URL = os.environ.get('MEDIA_URL', '/media/')
 
+# Local production runs use HTTP on localhost — secure cookies break admin sessions
+_local_hosts = {'localhost', '127.0.0.1', 'backend'}
+_running_on_localhost = _local_hosts.intersection(set(ALLOWED_HOSTS))
+
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    if not _running_on_localhost:
+        SESSION_COOKIE_SECURE = True
+        CSRF_COOKIE_SECURE = True
+
+if _running_on_localhost:
+    WHITENOISE_AUTOREFRESH = True

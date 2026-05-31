@@ -37,6 +37,14 @@ DEFAULT_CMS_ITEMS = [
         'Our certified trainers are passionate about helping you reach your goals.',
         'text',
     ),
+    ('Newsletter Heading', 'GET CONNECTED WITH US', 'text'),
+    (
+        'Newsletter Subheading',
+        'Join our community for motivation, tips, and exclusive offers.',
+        'text',
+    ),
+    ('Newsletter Button Text', 'Join Now', 'text'),
+    ('Newsletter Placeholder', 'Enter your email', 'text'),
 ]
 
 

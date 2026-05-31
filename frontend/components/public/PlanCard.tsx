@@ -28,10 +28,6 @@ export default function PlanCard({ plan, onClick }: PlanCardProps) {
     >
       <div className="plan-card-body">
         <h3 className="plan-card-title">{plan.name}</h3>
-        <div className="plan-card-price">
-          <span className="plan-card-price-amount">{formatCurrency(plan.price)}</span>
-          <span className="plan-card-duration">/ {plan.duration}</span>
-        </div>
         {plan.description && (
           <p className="plan-card-description">{plan.description}</p>
         )}
@@ -47,9 +43,16 @@ export default function PlanCard({ plan, onClick }: PlanCardProps) {
             )}
           </ul>
         )}
-        {onClick && (
-          <span className="plan-card-cta">View details</span>
-        )}
+        {onClick && <span className="plan-card-cta">View details</span>}
+      </div>
+      <div
+        className="card-price-badge card-price-badge--plan"
+        aria-label={`Price ${formatCurrency(plan.price)} per ${plan.duration}`}
+      >
+        <span className="card-price-badge__amount">
+          {formatCurrency(plan.price)}
+        </span>
+        <span className="card-price-badge__sub">/ {plan.duration}</span>
       </div>
     </article>
   );
